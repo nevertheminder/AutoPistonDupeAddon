@@ -9,6 +9,10 @@
 
 An automated shulker duping addon for Meteor Client, designed to place shulkers in front of pistons and seamlessly store them in nearby chests when your inventory fills up.
 
+## Video Tutorial & Showcase
+[![YouTube Guide](https://img.youtube.com/vi/INSERT_YOUR_VIDEO_ID_HERE/maxresdefault.jpg)](https://www.youtube.com/watch?v=INSERT_YOUR_VIDEO_ID_HERE)
+*(Click the image to watch the full setup and usage guide!)*
+
 ## Features
 - **Auto Placement**: Automatically places shulkers from your hotbar or inventory in up to 6 configurable locations.
 - **Anti-Ghost Item**: Advanced background synchronization that constantly refreshes your inventory so you never get stuck on invisible shulkers.
