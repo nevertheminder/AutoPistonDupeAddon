@@ -49,5 +49,7 @@ If you want to build the code yourself:
 Join our Discord server to get help, report bugs, and stay updated on new features!
 💬 **[Join the Discord](https://discord.gg/BnCrDsN5ZZ)**
 
-## Author
-Developed by **nevertheminder**.
+## Contributors
+- **[nevertheminder](https://github.com/nevertheminder)** - Lead Developer & Creator
+
+*Feel free to open a Pull Request if you want to contribute to the project!*
