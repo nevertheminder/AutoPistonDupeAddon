@@ -1,6 +1,9 @@
 # AutoPistonDupe Addon for Meteor Client
 
 <div align="center">
+  <a href="https://discord.gg/BnCrDsN5ZZ">
+    <img src="https://img.shields.io/discord/1337?color=7289da&label=Discord&logo=discord&logoColor=ffffff&style=for-the-badge" alt="Discord">
+  </a>
   <img src="https://img.shields.io/github/v/release/nevertheminder/AutoPistonDupeAddon?style=for-the-badge&color=success" alt="Release">
   <img src="https://img.shields.io/github/downloads/nevertheminder/AutoPistonDupeAddon/total?style=for-the-badge&color=blue" alt="Downloads">
   <img src="https://img.shields.io/github/stars/nevertheminder/AutoPistonDupeAddon?style=for-the-badge&color=yellow" alt="Stars">
@@ -41,6 +44,10 @@ If you want to build the code yourself:
 1. Clone this repository.
 2. Run `.\gradlew build` (Windows) or `./gradlew build` (Linux/Mac).
 3. The compiled jar will be located in the `build/libs/` folder.
+
+## Community & Support
+Join our Discord server to get help, report bugs, and stay updated on new features!
+💬 **[Join the Discord](https://discord.gg/BnCrDsN5ZZ)**
 
 ## Author
 Developed by **nevertheminder**.
