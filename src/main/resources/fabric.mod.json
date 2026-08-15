@@ -5,10 +5,10 @@
   "name": "Auto Piston Dupe Addon",
   "description": "An addon autopistondupe for Meteor Client addons.",
   "authors": [
-    "seasnail"
+    "nevertheminder"
   ],
   "contact": {
-    "sources": "https://github.com/MeteorDevelopment/meteor-autopistondupe"
+    "sources": "https://github.com/nevertheminder/AutoPistonDupeAddon"
   },
   "icon": "assets/autopistondupe/icon.png",
   "environment": "client",
