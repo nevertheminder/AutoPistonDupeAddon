@@ -2,6 +2,9 @@ package me.nevertheminder.autopistondupe;
 
 
 import me.nevertheminder.autopistondupe.modules.AutoPistonDupe;
+import me.nevertheminder.autopistondupe.modules.AutoChestBuilder;
+import me.nevertheminder.autopistondupe.modules.ChestWallBot;
+import me.nevertheminder.autopistondupe.commands.ChestBotCommand;
 import com.mojang.logging.LogUtils;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
@@ -23,6 +26,11 @@ public class AutoPistonDupeAddon extends MeteorAddon {
 
         // Modules
         Modules.get().add(new AutoPistonDupe());
+        Modules.get().add(new AutoChestBuilder());
+        Modules.get().add(new ChestWallBot());
+        
+        // Commands
+        Commands.add(new ChestBotCommand());
     }
 
     @Override

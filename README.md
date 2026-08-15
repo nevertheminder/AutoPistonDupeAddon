@@ -17,12 +17,14 @@ An automated shulker duping addon for Meteor Client, designed to place shulkers 
 *(Click the image to watch the full setup and usage guide!)*
 
 ## Features
-- **Auto Placement**: Automatically places shulkers from your hotbar or inventory in up to 6 configurable locations.
+- **Auto Piston Dupe**: Automatically places shulkers from your hotbar or inventory in up to 6 configurable locations.
 - **Anti-Ghost Item**: Advanced background synchronization that constantly refreshes your inventory so you never get stuck on invisible shulkers.
 - **Auto Storing (Dumping)**: When your inventory gets full, the addon automatically uses Baritone to walk to nearby chests and offload the shulkers, keeping a configurable amount to continue duping.
 - **Smart Chest Memory**: Remembers which chests are full and skips them automatically.
 - **Flexible Area Modes**: Define your chest storage using a simple Radius or by setting two corner points (TwoPoints mode) for precise storage rooms.
 - **Place-Only Mode**: A toggle for users who just want to stand still and place shulkers at lightning speed without pathing to chests.
+- **Auto Chest Builder**: Run at incredible speeds while perfectly placing a wall of double chests. Supports up to 7.8 blocks per second without dropping a single placement!
+- **Chest Wall Bot**: A fully automated macro that perfectly builds a wall of double chests between two set points (`.chestbot pos1` and `pos2`), working perfectly with Auto Chest Builder.
 - **Reach Support**: Fully configurable reach distance so you don't have to hug the chests to open them.
 - **Customizable Visuals**: Renders your placement targets and chest storage area with customizable colors.
 
