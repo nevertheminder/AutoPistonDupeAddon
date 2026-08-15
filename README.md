@@ -2,7 +2,7 @@
 
 <div align="center">
   <a href="https://discord.gg/BnCrDsN5ZZ">
-    <img src="https://img.shields.io/discord/1337?color=7289da&label=Discord&logo=discord&logoColor=ffffff&style=for-the-badge" alt="Discord">
+    <img src="https://img.shields.io/badge/Discord-Join%20Our%20Community-7289da?style=for-the-badge&logo=discord&logoColor=white" alt="Discord">
   </a>
   <img src="https://img.shields.io/github/v/release/nevertheminder/AutoPistonDupeAddon?style=for-the-badge&color=success" alt="Release">
   <img src="https://img.shields.io/github/downloads/nevertheminder/AutoPistonDupeAddon/total?style=for-the-badge&color=blue" alt="Downloads">
