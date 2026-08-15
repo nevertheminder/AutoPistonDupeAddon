@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "autopistondupe",
+  "version": "${version}",
+  "name": "Auto Piston Dupe Addon",
+  "description": "An addon autopistondupe for Meteor Client addons.",
+  "authors": [
+    "seasnail"
+  ],
+  "contact": {
+    "sources": "https://github.com/MeteorDevelopment/meteor-autopistondupe"
+  },
+  "icon": "assets/autopistondupe/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "me.nevertheminder.autopistondupe.AutoPistonDupeAddon"
+    ]
+  },
+  "custom": {
+    "meteor-client:color": "225,25,25",
+    "modmenu": {
+      "parent": {
+        "id": "meteor-client"
+      }
+    }
+  },
+  "depends": {
+    "java": ">=${jdk_version}",
+    "minecraft": "${minecraft_version}",
+    "meteor-client": "*"
+  }
+}
