@@ -222,6 +222,15 @@ public class AutoPistonDupe extends Module {
         .build()
     );
 
+    public final Setting<Integer> interactDelay = sgGeneral.add(new IntSetting.Builder()
+        .name("interact-delay")
+        .description("Delay in ticks to wait after clicking a chest before moving items. (1 tick = 50ms)")
+        .defaultValue(5)
+        .min(0)
+        .sliderMax(20)
+        .build()
+    );
+
     public final Setting<Double> syncDelay = sgGeneral.add(new DoubleSetting.Builder()
         .name("ghost-sync-delay")
         .description("Ticks between ghost item checks (lower is faster but sends more packets, supports decimals).")
@@ -571,7 +580,7 @@ public class AutoPistonDupe extends Module {
                     mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
                 });
                 
-                timer = 2; // Wait a tiny bit (0.1s) for GUI to open
+                timer = interactDelay.get(); // Wait for GUI to open based on user setting
             }
         }
     }
