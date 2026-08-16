@@ -64,8 +64,10 @@ public class AutoPistonDupe extends Module {
     public enum ChestFillOrder {
         None,
         Closest,
-        BottomToTop,
-        TopToBottom,
+        ColumnsBottomToTop,
+        ColumnsTopToBottom,
+        LayersBottomToTop,
+        LayersTopToBottom,
         LeftToRight,
         RightToLeft
     }
@@ -137,7 +139,7 @@ public class AutoPistonDupe extends Module {
     public final Setting<ChestFillOrder> fillOrder = sgGeneral.add(new EnumSetting.Builder<ChestFillOrder>()
         .name("chest-fill-order")
         .description("The order in which to fill chests.")
-        .defaultValue(ChestFillOrder.Closest)
+        .defaultValue(ChestFillOrder.ColumnsBottomToTop)
         .build()
     );
 
@@ -583,10 +585,17 @@ public class AutoPistonDupe extends Module {
             validChests.sort((p1, p2) -> {
                 if (order == ChestFillOrder.Closest) {
                     return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
-                } else if (order == ChestFillOrder.BottomToTop) {
+                } else if (order == ChestFillOrder.ColumnsBottomToTop || order == ChestFillOrder.ColumnsTopToBottom) {
+                    double dist2d1 = Math.pow(p1.getX() - playerPos.getX(), 2) + Math.pow(p1.getZ() - playerPos.getZ(), 2);
+                    double dist2d2 = Math.pow(p2.getX() - playerPos.getX(), 2) + Math.pow(p2.getZ() - playerPos.getZ(), 2);
+                    if (Double.compare(dist2d1, dist2d2) != 0) return Double.compare(dist2d1, dist2d2);
+                    
+                    if (order == ChestFillOrder.ColumnsBottomToTop) return Integer.compare(p1.getY(), p2.getY());
+                    else return Integer.compare(p2.getY(), p1.getY());
+                } else if (order == ChestFillOrder.LayersBottomToTop) {
                     if (p1.getY() != p2.getY()) return Integer.compare(p1.getY(), p2.getY());
                     return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
-                } else if (order == ChestFillOrder.TopToBottom) {
+                } else if (order == ChestFillOrder.LayersTopToBottom) {
                     if (p1.getY() != p2.getY()) return Integer.compare(p2.getY(), p1.getY());
                     return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
                 } else if (order == ChestFillOrder.LeftToRight || order == ChestFillOrder.RightToLeft) {
