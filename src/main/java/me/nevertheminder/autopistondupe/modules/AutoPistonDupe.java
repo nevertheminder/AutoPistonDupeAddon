@@ -539,15 +539,19 @@ public class AutoPistonDupe extends Module {
                     Goal reachGoal = new Goal() {
                         @Override
                         public boolean isInGoal(int x, int y, int z) {
-                            Vec3d eye = new Vec3d(x + 0.5, y + mc.player.getStandingEyeHeight(), z + 0.5);
-                            return eye.distanceTo(hitVec) <= pathingReach;
+                            double dx = (x + 0.5) - (currentChest.getX() + 0.5);
+                            double dz = (z + 0.5) - (currentChest.getZ() + 0.5);
+                            double dist2d = Math.sqrt(dx * dx + dz * dz);
+                            
+                            // Must be horizontally adjacent to the chest column (dist2d <= 1.2)
+                            // and player must remain roughly on the same floor level
+                            return dist2d <= 1.2 && Math.abs(y - mc.player.getY()) <= 2;
                         }
                         @Override
                         public double heuristic(int x, int y, int z) {
-                            double dx = x - currentChest.getX();
-                            double dy = y - currentChest.getY();
-                            double dz = z - currentChest.getZ();
-                            return Math.sqrt(dx * dx + dy * dy + dz * dz);
+                            double dx = (x + 0.5) - (currentChest.getX() + 0.5);
+                            double dz = (z + 0.5) - (currentChest.getZ() + 0.5);
+                            return Math.sqrt(dx * dx + dz * dz);
                         }
                     };
                     baritone.getCustomGoalProcess().setGoalAndPath(reachGoal);
