@@ -170,12 +170,12 @@ public class AutoPistonDupe extends Module {
         .build()
     );
 
-    public final Setting<Integer> placeDelay = sgGeneral.add(new IntSetting.Builder()
+    public final Setting<Double> placeDelay = sgGeneral.add(new DoubleSetting.Builder()
         .name("place-delay")
-        .description("Delay in ticks before placing the next shulker.")
-        .defaultValue(5)
-        .min(0)
-        .sliderMax(20)
+        .description("Delay in ticks before placing the next shulker (supports decimals like 1.5).")
+        .defaultValue(2.0)
+        .min(0.0)
+        .sliderMax(20.0)
         .build()
     );
 
@@ -229,7 +229,7 @@ public class AutoPistonDupe extends Module {
     );
 
     private State state = State.DUPING;
-    private int timer = 0;
+    private double timer = 0;
     private final Set<BlockPos> fullChests = new HashSet<>();
     private BlockPos currentChest = null;
     private boolean isPathing = false;
@@ -289,7 +289,7 @@ public class AutoPistonDupe extends Module {
         IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
         
         if (timer > 0) {
-            timer--;
+            timer -= 1.0;
             return;
         }
 
@@ -363,7 +363,9 @@ public class AutoPistonDupe extends Module {
                 }
             }
             if (placedAny) {
-                timer = placeDelay.get();
+                // Prevent huge negative buildup if we haven't placed in a while
+                if (timer < -10) timer = 0;
+                timer += placeDelay.get();
             }
 
         } else if (state == State.DUMPING) {
