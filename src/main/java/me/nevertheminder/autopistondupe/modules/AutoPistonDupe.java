@@ -281,6 +281,7 @@ public class AutoPistonDupe extends Module {
     private BlockPos currentChest = null;
     private boolean isPathing = false;
     private int syncSlot = 9;
+    private int stuckCounter = 0;
 
     public AutoPistonDupe() {
         super(AutoPistonDupeAddon.CATEGORY, "auto-piston-dupe", "Automates piston duping and dumping into chests.");
@@ -477,6 +478,7 @@ public class AutoPistonDupe extends Module {
             // We are dumping. 
             // If screen is open, dump.
             if (mc.currentScreen instanceof GenericContainerScreen) {
+                stuckCounter = 0; // Successfully opened GUI, reset stuck counter
                 GenericContainerScreenHandler handler = ((GenericContainerScreen) mc.currentScreen).getScreenHandler();
                 
                 // Find first shulker in player inventory
@@ -579,6 +581,15 @@ public class AutoPistonDupe extends Module {
                 Rotations.rotate(Rotations.getYaw(faceHitVec), Rotations.getPitch(faceHitVec), () -> {
                     mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
                 });
+                
+                stuckCounter++;
+                if (stuckCounter > 5) {
+                    // Desync detected. Nudge the player slightly forward to force a movement packet sync
+                    Vec3d lookVec = mc.player.getRotationVector();
+                    mc.player.setPos(mc.player.getX() + lookVec.x * 0.1, mc.player.getY(), mc.player.getZ() + lookVec.z * 0.1);
+                    stuckCounter = 0;
+                    info("Fixing server desync automatically...");
+                }
                 
                 timer = interactDelay.get(); // Wait for GUI to open based on user setting
             }
