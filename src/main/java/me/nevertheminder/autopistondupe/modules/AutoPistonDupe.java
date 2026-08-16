@@ -597,7 +597,7 @@ public class AutoPistonDupe extends Module {
                 if (stuckCounter > 5) {
                     // Desync detected. Nudge the player slightly forward to force a movement packet sync
                     Vec3d lookVec = mc.player.getRotationVector();
-                    mc.player.setPos(mc.player.getX() + lookVec.x * 0.1, mc.player.getY(), mc.player.getZ() + lookVec.z * 0.1);
+                    mc.player.setPos(mc.player.getX() + lookVec.x * 0.3, mc.player.getY(), mc.player.getZ() + lookVec.z * 0.3);
                     stuckCounter = 0;
                     info("Fixing server desync automatically...");
                 }

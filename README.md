@@ -48,7 +48,7 @@ A fully automated macro that perfectly coordinates with **Auto Chest Builder** t
 You can download the ready-to-use mod file directly from the [Releases](https://github.com/nevertheminder/AutoPistonDupeAddon/releases) page!
 
 **For beginners:**
-1. Go to the [Releases](https://github.com/nevertheminder/AutoPistonDupeAddon/releases) page and download `autopistondupe-3.1.7.jar`.
+1. Go to the [Releases](https://github.com/nevertheminder/AutoPistonDupeAddon/releases) page and download `autopistondupe-3.1.8.jar`.
 2. Move the downloaded `.jar` file into your `.minecraft/mods` folder.
 3. Make sure you also have the following installed in your `mods` folder:
    - **Meteor Client** (Fabric 1.21.4 version): [Download here](https://meteorclient.com/)
