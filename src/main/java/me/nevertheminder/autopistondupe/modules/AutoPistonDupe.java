@@ -14,6 +14,10 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
+import meteordevelopment.meteorclient.gui.GuiTheme;
+import meteordevelopment.meteorclient.gui.widgets.WWidget;
+import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
+import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.BarrelBlock;
 import net.minecraft.block.Block;
@@ -137,12 +141,6 @@ public class AutoPistonDupe extends Module {
         .build()
     );
 
-    public final Setting<Boolean> clearMemory = sgGeneral.add(new BoolSetting.Builder()
-        .name("clear-chest-memory")
-        .description("Toggle to wipe the persistent memory of full chests.")
-        .defaultValue(false)
-        .build()
-    );
 
     public final Setting<BlockPos> chestOrigin = sgGeneral.add(new BlockPosSetting.Builder()
         .name("chest-origin")
@@ -277,6 +275,18 @@ public class AutoPistonDupe extends Module {
         loadMemory();
     }
 
+    @Override
+    public WWidget getWidget(GuiTheme theme) {
+        WTable table = theme.table();
+        WButton clearBtn = table.add(theme.button("**CLEAR CHEST MEMORY**")).expandX().minWidth(100).widget();
+        clearBtn.action = () -> {
+            fullChests.clear();
+            if (MEMORY_FILE.exists()) MEMORY_FILE.delete();
+            info("Persistent chest memory cleared.");
+        };
+        return table;
+    }
+
     private void saveMemory() {
         try {
             if (!MEMORY_FILE.getParentFile().exists()) MEMORY_FILE.getParentFile().mkdirs();
@@ -352,13 +362,6 @@ public class AutoPistonDupe extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if (mc.player == null || mc.world == null) return;
-        
-        if (clearMemory.get()) {
-            fullChests.clear();
-            if (MEMORY_FILE.exists()) MEMORY_FILE.delete();
-            clearMemory.set(false);
-            info("Persistent chest memory cleared.");
-        }
         
         IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
         
