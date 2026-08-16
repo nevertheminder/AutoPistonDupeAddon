@@ -58,6 +58,7 @@ public class AutoPistonDupe extends Module {
     }
 
     public enum ChestFillOrder {
+        None,
         Closest,
         BottomToTop,
         TopToBottom,
@@ -575,32 +576,34 @@ public class AutoPistonDupe extends Module {
         BlockPos playerPos = mc.player.getBlockPos();
         ChestFillOrder order = fillOrder.get();
 
-        validChests.sort((p1, p2) -> {
-            if (order == ChestFillOrder.Closest) {
-                return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
-            } else if (order == ChestFillOrder.BottomToTop) {
-                if (p1.getY() != p2.getY()) return Integer.compare(p1.getY(), p2.getY());
-                return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
-            } else if (order == ChestFillOrder.TopToBottom) {
-                if (p1.getY() != p2.getY()) return Integer.compare(p2.getY(), p1.getY());
-                return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
-            } else if (order == ChestFillOrder.LeftToRight || order == ChestFillOrder.RightToLeft) {
-                Direction dir = mc.player.getHorizontalFacing();
-                Direction right = dir.rotateYClockwise();
-                int offset1 = p1.getX() * right.getOffsetX() + p1.getZ() * right.getOffsetZ();
-                int offset2 = p2.getX() * right.getOffsetX() + p2.getZ() * right.getOffsetZ();
-                
-                if (offset1 != offset2) {
-                    if (order == ChestFillOrder.LeftToRight) return Integer.compare(offset1, offset2);
-                    else return Integer.compare(offset2, offset1);
+        if (order != ChestFillOrder.None) {
+            validChests.sort((p1, p2) -> {
+                if (order == ChestFillOrder.Closest) {
+                    return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
+                } else if (order == ChestFillOrder.BottomToTop) {
+                    if (p1.getY() != p2.getY()) return Integer.compare(p1.getY(), p2.getY());
+                    return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
+                } else if (order == ChestFillOrder.TopToBottom) {
+                    if (p1.getY() != p2.getY()) return Integer.compare(p2.getY(), p1.getY());
+                    return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
+                } else if (order == ChestFillOrder.LeftToRight || order == ChestFillOrder.RightToLeft) {
+                    Direction dir = mc.player.getHorizontalFacing();
+                    Direction right = dir.rotateYClockwise();
+                    int offset1 = p1.getX() * right.getOffsetX() + p1.getZ() * right.getOffsetZ();
+                    int offset2 = p2.getX() * right.getOffsetX() + p2.getZ() * right.getOffsetZ();
+                    
+                    if (offset1 != offset2) {
+                        if (order == ChestFillOrder.LeftToRight) return Integer.compare(offset1, offset2);
+                        else return Integer.compare(offset2, offset1);
+                    }
+                    
+                    // If same column, sort bottom to top
+                    if (p1.getY() != p2.getY()) return Integer.compare(p1.getY(), p2.getY());
+                    return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
                 }
-                
-                // If same column, sort bottom to top
-                if (p1.getY() != p2.getY()) return Integer.compare(p1.getY(), p2.getY());
-                return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
-            }
-            return 0;
-        });
+                return 0;
+            });
+        }
 
         return validChests.get(0);
     }
