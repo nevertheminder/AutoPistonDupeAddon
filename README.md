@@ -28,6 +28,22 @@ An automated shulker duping addon for Meteor Client, designed to place shulkers 
 - **Reach Support**: Fully configurable reach distance so you don't have to hug the chests to open them.
 - **Customizable Visuals**: Renders your placement targets and chest storage area with customizable colors.
 
+## Module Usage Guides
+
+### 🧱 Auto Chest Builder
+This module allows you to build massive walls of double chests incredibly fast simply by walking backwards or sideways. 
+- **Width**: How many chests wide the wall should be.
+- **Height**: How many chests high the wall should be.
+- **Distance**: How far away from you the chests will be placed.
+- **Blocks Per Tick (BPT) & Delay**: Set BPT to `5` and Delay to `0` for maximum vanilla-friendly speeds without getting kicked.
+- **How to use**: Simply turn it on, hold chests in your hotbar, and slowly walk along the line you want to build.
+
+### 🤖 Chest Wall Bot
+A fully automated macro that perfectly coordinates with **Auto Chest Builder** to build perfectly straight chest walls between two coordinates.
+1. Walk to the start of your desired wall and type `.chestbot pos1` in chat.
+2. Walk to the end of your desired wall and type `.chestbot pos2`.
+3. Stand roughly parallel to the wall, look in the general direction you want to walk, and turn on the module.
+4. The bot will automatically correct your yaw, hold the strafe keys, and perfectly walk the line while Auto Chest Builder does the rest!
 ## Installation / Download
 You can download the ready-to-use mod file directly from the [Releases](https://github.com/nevertheminder/AutoPistonDupeAddon/releases) page!
 
