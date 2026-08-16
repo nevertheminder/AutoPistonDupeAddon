@@ -519,15 +519,15 @@ public class AutoPistonDupe extends Module {
             Vec3d hitVec = new Vec3d(currentChest.getX() + 0.5, currentChest.getY() + 0.5, currentChest.getZ() + 0.5);
             double dist = mc.player.getEyePos().distanceTo(hitVec);
             
-            double maxReach = chestReach.get() - 0.2; // Add safety margin
+            double maxPathingReach = 3.0; // Force bot to walk within 3 blocks to guarantee server acceptance
             
-            if (dist > maxReach) {
+            if (dist > maxPathingReach) {
                 if (!isPathing || !baritone.getPathingBehavior().isPathing()) {
                     Goal reachGoal = new Goal() {
                         @Override
                         public boolean isInGoal(int x, int y, int z) {
                             Vec3d eye = new Vec3d(x + 0.5, y + mc.player.getStandingEyeHeight(), z + 0.5);
-                            return eye.distanceTo(hitVec) <= maxReach;
+                            return eye.distanceTo(hitVec) <= maxPathingReach;
                         }
                         @Override
                         public double heuristic(int x, int y, int z) {
@@ -546,9 +546,24 @@ public class AutoPistonDupe extends Module {
                     isPathing = false;
                 }
                 
-                // Open chest (click bottom face if it's above us)
-                Direction side = mc.player.getEyeY() < currentChest.getY() ? Direction.DOWN : Direction.UP;
-                BlockHitResult hitResult = new BlockHitResult(hitVec, side, currentChest, false);
+                // Calculate which horizontal face is closest to the player
+                double dx = mc.player.getX() - (currentChest.getX() + 0.5);
+                double dz = mc.player.getZ() - (currentChest.getZ() + 0.5);
+                Direction side;
+                if (Math.abs(dx) > Math.abs(dz)) {
+                    side = dx > 0 ? Direction.EAST : Direction.WEST;
+                } else {
+                    side = dz > 0 ? Direction.SOUTH : Direction.NORTH;
+                }
+                
+                // Adjust hitVec to be exactly on the chosen face
+                Vec3d faceHitVec = new Vec3d(
+                    currentChest.getX() + 0.5 + side.getOffsetX() * 0.5,
+                    currentChest.getY() + 0.5,
+                    currentChest.getZ() + 0.5 + side.getOffsetZ() * 0.5
+                );
+                
+                BlockHitResult hitResult = new BlockHitResult(faceHitVec, side, currentChest, false);
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
                 timer = 10; // Wait a bit for GUI to open
             }
