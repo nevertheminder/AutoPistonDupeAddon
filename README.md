@@ -30,7 +30,7 @@ An automated shulker duping addon for Meteor Client, designed to place shulkers 
 
 ## Module Usage Guides
 
-### 🧱 Auto Chest Builder
+### Auto Chest Builder
 This module allows you to build massive walls of double chests incredibly fast simply by walking backwards or sideways. 
 - **Width**: How many chests wide the wall should be.
 - **Height**: How many chests high the wall should be.
@@ -38,7 +38,7 @@ This module allows you to build massive walls of double chests incredibly fast s
 - **Blocks Per Tick (BPT) & Delay**: Set BPT to `5` and Delay to `0` for maximum vanilla-friendly speeds without getting kicked.
 - **How to use**: Simply turn it on, hold chests in your hotbar, and slowly walk along the line you want to build.
 
-### 🤖 Chest Wall Bot
+###  Chest Wall Bot
 A fully automated macro that perfectly coordinates with **Auto Chest Builder** to build perfectly straight chest walls between two coordinates.
 1. Walk to the start of your desired wall and type `.chestbot pos1` in chat.
 2. Walk to the end of your desired wall and type `.chestbot pos2`.
