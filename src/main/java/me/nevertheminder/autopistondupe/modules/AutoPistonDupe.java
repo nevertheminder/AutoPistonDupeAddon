@@ -516,10 +516,26 @@ public class AutoPistonDupe extends Module {
                 }
             }
 
-            double dist = mc.player.getBlockPos().getSquaredDistance(currentChest);
-            if (dist > chestReach.get() * chestReach.get()) {
+            Vec3d hitVec = new Vec3d(currentChest.getX() + 0.5, currentChest.getY() + 0.5, currentChest.getZ() + 0.5);
+            double dist = mc.player.getEyePos().distanceTo(hitVec);
+            
+            if (dist > chestReach.get()) {
                 if (!isPathing || !baritone.getPathingBehavior().isPathing()) {
-                    baritone.getCustomGoalProcess().setGoalAndPath(new GoalNear(currentChest, (int)Math.max(1, chestReach.get() - 1)));
+                    Goal reachGoal = new Goal() {
+                        @Override
+                        public boolean isInGoal(int x, int y, int z) {
+                            Vec3d eye = new Vec3d(x + 0.5, y + mc.player.getStandingEyeHeight(), z + 0.5);
+                            return eye.distanceTo(hitVec) <= chestReach.get();
+                        }
+                        @Override
+                        public double heuristic(int x, int y, int z) {
+                            double dx = x - currentChest.getX();
+                            double dy = y - currentChest.getY();
+                            double dz = z - currentChest.getZ();
+                            return Math.sqrt(dx * dx + dy * dy + dz * dz);
+                        }
+                    };
+                    baritone.getCustomGoalProcess().setGoalAndPath(reachGoal);
                     isPathing = true;
                 }
             } else {
@@ -529,7 +545,6 @@ public class AutoPistonDupe extends Module {
                 }
                 
                 // Open chest
-                Vec3d hitVec = new Vec3d(currentChest.getX() + 0.5, currentChest.getY() + 0.5, currentChest.getZ() + 0.5);
                 BlockHitResult hitResult = new BlockHitResult(hitVec, Direction.UP, currentChest, false);
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
                 timer = 10; // Wait a bit for GUI to open
