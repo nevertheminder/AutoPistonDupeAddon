@@ -188,12 +188,12 @@ public class AutoPistonDupe extends Module {
         .build()
     );
 
-    public final Setting<Integer> syncDelay = sgGeneral.add(new IntSetting.Builder()
+    public final Setting<Double> syncDelay = sgGeneral.add(new DoubleSetting.Builder()
         .name("ghost-sync-delay")
-        .description("Ticks between ghost item checks (lower is faster but sends more packets).")
-        .defaultValue(2)
-        .min(0)
-        .sliderMax(20)
+        .description("Ticks between ghost item checks (lower is faster but sends more packets, supports decimals).")
+        .defaultValue(2.0)
+        .min(0.0)
+        .sliderMax(20.0)
         .build()
     );
 
@@ -230,6 +230,7 @@ public class AutoPistonDupe extends Module {
 
     private State state = State.DUPING;
     private double timer = 0;
+    private double syncTimer = 0;
     private final Set<BlockPos> fullChests = new HashSet<>();
     private BlockPos currentChest = null;
     private boolean isPathing = false;
@@ -243,6 +244,7 @@ public class AutoPistonDupe extends Module {
     public void onActivate() {
         state = State.DUPING;
         timer = 0;
+        syncTimer = 0;
         fullChests.clear();
         currentChest = null;
         isPathing = false;
@@ -304,7 +306,12 @@ public class AutoPistonDupe extends Module {
             }
 
             // Anti-ghost item background sync
-            if (syncDelay.get() == 0 || mc.player.age % syncDelay.get() == 0) { // Configurable sync delay
+            syncTimer -= 1.0;
+            if (syncTimer <= 0) {
+                if (syncTimer < -10) syncTimer = 0; // prevent huge negative buildup
+                syncTimer += syncDelay.get();
+                if (syncDelay.get() == 0) syncTimer = 0; // if 0, run every tick
+
                 for (int count = 0; count < 36; count++) {
                     syncSlot++;
                     if (syncSlot > 44) syncSlot = 9;
