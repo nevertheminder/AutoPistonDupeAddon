@@ -519,13 +519,15 @@ public class AutoPistonDupe extends Module {
             Vec3d hitVec = new Vec3d(currentChest.getX() + 0.5, currentChest.getY() + 0.5, currentChest.getZ() + 0.5);
             double dist = mc.player.getEyePos().distanceTo(hitVec);
             
-            if (dist > chestReach.get()) {
+            double maxReach = chestReach.get() - 0.2; // Add safety margin
+            
+            if (dist > maxReach) {
                 if (!isPathing || !baritone.getPathingBehavior().isPathing()) {
                     Goal reachGoal = new Goal() {
                         @Override
                         public boolean isInGoal(int x, int y, int z) {
                             Vec3d eye = new Vec3d(x + 0.5, y + mc.player.getStandingEyeHeight(), z + 0.5);
-                            return eye.distanceTo(hitVec) <= chestReach.get();
+                            return eye.distanceTo(hitVec) <= maxReach;
                         }
                         @Override
                         public double heuristic(int x, int y, int z) {
@@ -544,8 +546,9 @@ public class AutoPistonDupe extends Module {
                     isPathing = false;
                 }
                 
-                // Open chest
-                BlockHitResult hitResult = new BlockHitResult(hitVec, Direction.UP, currentChest, false);
+                // Open chest (click bottom face if it's above us)
+                Direction side = mc.player.getEyeY() < currentChest.getY() ? Direction.DOWN : Direction.UP;
+                BlockHitResult hitResult = new BlockHitResult(hitVec, side, currentChest, false);
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
                 timer = 10; // Wait a bit for GUI to open
             }
