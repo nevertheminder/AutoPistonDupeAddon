@@ -13,6 +13,7 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
+import meteordevelopment.meteorclient.utils.player.Rotations;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
@@ -519,15 +520,16 @@ public class AutoPistonDupe extends Module {
             Vec3d hitVec = new Vec3d(currentChest.getX() + 0.5, currentChest.getY() + 0.5, currentChest.getZ() + 0.5);
             double dist = mc.player.getEyePos().distanceTo(hitVec);
             
-            double maxPathingReach = 3.0; // Force bot to walk within 3 blocks to guarantee server acceptance
+            double interactReach = 4.2; // Maximum distance to open the chest (server max is 4.5)
+            double pathingReach = 3.6; // Strict distance Baritone must achieve to satisfy the goal
             
-            if (dist > maxPathingReach) {
+            if (dist > interactReach) {
                 if (!isPathing || !baritone.getPathingBehavior().isPathing()) {
                     Goal reachGoal = new Goal() {
                         @Override
                         public boolean isInGoal(int x, int y, int z) {
                             Vec3d eye = new Vec3d(x + 0.5, y + mc.player.getStandingEyeHeight(), z + 0.5);
-                            return eye.distanceTo(hitVec) <= maxPathingReach;
+                            return eye.distanceTo(hitVec) <= pathingReach;
                         }
                         @Override
                         public double heuristic(int x, int y, int z) {
@@ -564,7 +566,11 @@ public class AutoPistonDupe extends Module {
                 );
                 
                 BlockHitResult hitResult = new BlockHitResult(faceHitVec, side, currentChest, false);
-                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
+                
+                Rotations.rotate(Rotations.getYaw(faceHitVec), Rotations.getPitch(faceHitVec), () -> {
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
+                });
+                
                 timer = 10; // Wait a bit for GUI to open
             }
         }
