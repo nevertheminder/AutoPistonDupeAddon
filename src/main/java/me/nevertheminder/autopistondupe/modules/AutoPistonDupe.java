@@ -40,11 +40,29 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Comparator;
+import java.util.stream.Collectors;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.lang.reflect.Type;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import meteordevelopment.meteorclient.MeteorClient;
 
 public class AutoPistonDupe extends Module {
     public enum State {
         DUPING,
         DUMPING
+    }
+
+    public enum ChestFillOrder {
+        Closest,
+        BottomToTop,
+        TopToBottom,
+        LeftToRight,
+        RightToLeft
     }
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -108,6 +126,20 @@ public class AutoPistonDupe extends Module {
         .name("chest-area-mode")
         .description("How to define the chest area.")
         .defaultValue(ChestAreaMode.Radius)
+        .build()
+    );
+
+    public final Setting<ChestFillOrder> fillOrder = sgGeneral.add(new EnumSetting.Builder<ChestFillOrder>()
+        .name("chest-fill-order")
+        .description("The order in which to fill chests.")
+        .defaultValue(ChestFillOrder.Closest)
+        .build()
+    );
+
+    public final Setting<Boolean> clearMemory = sgGeneral.add(new BoolSetting.Builder()
+        .name("clear-chest-memory")
+        .description("Toggle to wipe the persistent memory of full chests.")
+        .defaultValue(false)
         .build()
     );
 
@@ -232,12 +264,44 @@ public class AutoPistonDupe extends Module {
     private double timer = 0;
     private double syncTimer = 0;
     private final Set<BlockPos> fullChests = new HashSet<>();
+    private static final File MEMORY_FILE = new File(MeteorClient.FOLDER, "autopistondupe_chest_memory.json");
+    private final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    
     private BlockPos currentChest = null;
     private boolean isPathing = false;
     private int syncSlot = 9;
 
     public AutoPistonDupe() {
         super(AutoPistonDupeAddon.CATEGORY, "auto-piston-dupe", "Automates piston duping and dumping into chests.");
+        loadMemory();
+    }
+
+    private void saveMemory() {
+        try {
+            if (!MEMORY_FILE.getParentFile().exists()) MEMORY_FILE.getParentFile().mkdirs();
+            List<Long> list = fullChests.stream().map(BlockPos::asLong).collect(Collectors.toList());
+            try (FileWriter writer = new FileWriter(MEMORY_FILE)) {
+                GSON.toJson(list, writer);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadMemory() {
+        if (!MEMORY_FILE.exists()) return;
+        try (FileReader reader = new FileReader(MEMORY_FILE)) {
+            Type type = new TypeToken<List<Long>>(){}.getType();
+            List<Long> list = GSON.fromJson(reader, type);
+            if (list != null) {
+                fullChests.clear();
+                for (Long l : list) {
+                    fullChests.add(BlockPos.fromLong(l));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -245,10 +309,10 @@ public class AutoPistonDupe extends Module {
         state = State.DUPING;
         timer = 0;
         syncTimer = 0;
-        fullChests.clear();
         currentChest = null;
         isPathing = false;
         syncSlot = 9;
+        loadMemory(); // Reload memory just in case it was edited externally
     }
 
     @Override
@@ -287,6 +351,13 @@ public class AutoPistonDupe extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if (mc.player == null || mc.world == null) return;
+        
+        if (clearMemory.get()) {
+            fullChests.clear();
+            if (MEMORY_FILE.exists()) MEMORY_FILE.delete();
+            clearMemory.set(false);
+            info("Persistent chest memory cleared.");
+        }
         
         IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
         
@@ -405,7 +476,10 @@ public class AutoPistonDupe extends Module {
                 }
 
                 if (chestFull) {
-                    if (currentChest != null) fullChests.add(currentChest);
+                    if (currentChest != null) {
+                        fullChests.add(currentChest);
+                        saveMemory();
+                    }
                     mc.player.closeHandledScreen();
                     currentChest = null;
                     return;
@@ -458,9 +532,6 @@ public class AutoPistonDupe extends Module {
     }
 
     private BlockPos findNearestAvailableChest() {
-        BlockPos best = null;
-        double bestDist = Double.MAX_VALUE;
-
         int minX, minY, minZ, maxX, maxY, maxZ;
 
         if (chestMode.get() == ChestAreaMode.Radius) {
@@ -483,6 +554,8 @@ public class AutoPistonDupe extends Module {
             maxZ = Math.max(p1.getZ(), p2.getZ());
         }
 
+        List<BlockPos> validChests = new ArrayList<>();
+
         for (int x = minX; x <= maxX; x++) {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
@@ -491,16 +564,45 @@ public class AutoPistonDupe extends Module {
 
                     net.minecraft.block.BlockState state = mc.world.getBlockState(p);
                     if (state.getBlock() instanceof ChestBlock || state.getBlock() instanceof BarrelBlock) {
-                        double d = mc.player.getBlockPos().getSquaredDistance(p);
-                        if (d < bestDist) {
-                            bestDist = d;
-                            best = p;
-                        }
+                        validChests.add(p);
                     }
                 }
             }
         }
-        return best;
+        
+        if (validChests.isEmpty()) return null;
+
+        BlockPos playerPos = mc.player.getBlockPos();
+        ChestFillOrder order = fillOrder.get();
+
+        validChests.sort((p1, p2) -> {
+            if (order == ChestFillOrder.Closest) {
+                return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
+            } else if (order == ChestFillOrder.BottomToTop) {
+                if (p1.getY() != p2.getY()) return Integer.compare(p1.getY(), p2.getY());
+                return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
+            } else if (order == ChestFillOrder.TopToBottom) {
+                if (p1.getY() != p2.getY()) return Integer.compare(p2.getY(), p1.getY());
+                return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
+            } else if (order == ChestFillOrder.LeftToRight || order == ChestFillOrder.RightToLeft) {
+                Direction dir = mc.player.getHorizontalFacing();
+                Direction right = dir.rotateYClockwise();
+                int offset1 = p1.getX() * right.getOffsetX() + p1.getZ() * right.getOffsetZ();
+                int offset2 = p2.getX() * right.getOffsetX() + p2.getZ() * right.getOffsetZ();
+                
+                if (offset1 != offset2) {
+                    if (order == ChestFillOrder.LeftToRight) return Integer.compare(offset1, offset2);
+                    else return Integer.compare(offset2, offset1);
+                }
+                
+                // If same column, sort bottom to top
+                if (p1.getY() != p2.getY()) return Integer.compare(p1.getY(), p2.getY());
+                return Double.compare(p1.getSquaredDistance(playerPos), p2.getSquaredDistance(playerPos));
+            }
+            return 0;
+        });
+
+        return validChests.get(0);
     }
 
     @EventHandler
