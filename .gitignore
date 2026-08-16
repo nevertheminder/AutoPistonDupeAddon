@@ -31,3 +31,6 @@ bin/
 # fabric
 
 run/
+
+# Antigravity IDE
+.agents/
