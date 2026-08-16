@@ -386,6 +386,11 @@ public class AutoPistonDupe extends Module {
         int shulkers = getShulkerCount();
 
         if (state == State.DUPING) {
+            // Anti-ghost GUI: If the server opens a chest late due to ping, close it instantly.
+            if (mc.currentScreen instanceof net.minecraft.client.gui.screen.ingame.GenericContainerScreen) {
+                mc.player.closeHandledScreen();
+            }
+
             if (!placeOnlyMode.get() && isInventoryFull()) {
                 state = State.DUMPING;
                 baritone.getPathingBehavior().cancelEverything();
@@ -573,11 +578,13 @@ public class AutoPistonDupe extends Module {
                     side = dz > 0 ? Direction.SOUTH : Direction.NORTH;
                 }
                 
-                // Adjust hitVec to be exactly on the chosen face
+                // Adjust hitVec to point to the actual physical boundary of the chest.
+                // A standard chest collision box is not a full 1x1x1 block.
+                // It is 14/16 wide/long (0.875) and 14/16 tall. The center offset is 0.4375.
                 Vec3d faceHitVec = new Vec3d(
-                    currentChest.getX() + 0.5 + side.getOffsetX() * 0.5,
-                    currentChest.getY() + 0.5,
-                    currentChest.getZ() + 0.5 + side.getOffsetZ() * 0.5
+                    currentChest.getX() + 0.5 + side.getOffsetX() * 0.4375,
+                    currentChest.getY() + 0.4375,
+                    currentChest.getZ() + 0.5 + side.getOffsetZ() * 0.4375
                 );
                 
                 BlockHitResult hitResult = new BlockHitResult(faceHitVec, side, currentChest, false);
