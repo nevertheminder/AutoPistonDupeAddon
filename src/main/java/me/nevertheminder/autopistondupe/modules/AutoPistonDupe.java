@@ -520,8 +520,8 @@ public class AutoPistonDupe extends Module {
             Vec3d hitVec = new Vec3d(currentChest.getX() + 0.5, currentChest.getY() + 0.5, currentChest.getZ() + 0.5);
             double dist = mc.player.getEyePos().distanceTo(hitVec);
             
-            double interactReach = 4.2; // Maximum distance to open the chest (server max is 4.5)
-            double pathingReach = 3.6; // Strict distance Baritone must achieve to satisfy the goal
+            double interactReach = 4.4; // Maximum distance to open the chest (server max is 4.5)
+            double pathingReach = 4.0; // Strict distance Baritone must achieve to satisfy the goal
             
             if (dist > interactReach) {
                 if (!isPathing || !baritone.getPathingBehavior().isPathing()) {
@@ -571,7 +571,7 @@ public class AutoPistonDupe extends Module {
                     mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
                 });
                 
-                timer = 10; // Wait a bit for GUI to open
+                timer = 2; // Wait a tiny bit (0.1s) for GUI to open
             }
         }
     }
